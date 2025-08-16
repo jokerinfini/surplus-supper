@@ -6,6 +6,9 @@ import { Search, MapPin, Star, ShoppingCart, Facebook, Twitter, Instagram } from
 import { SearchBar } from '@/components/features/search-bar'
 import { RestaurantCard } from '@/components/features/restaurant-card'
 import type { Restaurant } from '@/lib/api'
+import AuthModal from '@/components/auth/auth-modal'
+import { isAuthenticated, getUser, logout } from '@/lib/auth'
+import type { User } from '@/lib/auth'
 
 // Recipe Modal Component
 function RecipeModal({ isOpen, onClose, ingredients, restaurantName }: any) {
@@ -283,6 +286,8 @@ export default function HomePage() {
   const [searchResults, setSearchResults] = useState<Restaurant[]>([])
   const [showResults, setShowResults] = useState(false)
   const { isModalOpen, currentRestaurant, openModal, closeModal } = useRestaurantModal()
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
 
   const handleSearch = (results: Restaurant[]) => {
     setSearchResults(results);
@@ -292,6 +297,32 @@ export default function HomePage() {
   const handleHomeClick = () => {
     setShowResults(false);
     setSearchResults([]);
+  };
+
+  // Authentication effects
+  useEffect(() => {
+    const checkAuth = () => {
+      console.log('Checking authentication...');
+      if (isAuthenticated()) {
+        const currentUser = getUser();
+        console.log('User is authenticated:', currentUser);
+        setUser(currentUser);
+      } else {
+        console.log('User is not authenticated');
+      }
+    };
+    
+    checkAuth();
+  }, []);
+
+  const handleAuthSuccess = () => {
+    const currentUser = getUser();
+    setUser(currentUser);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setUser(null);
   };
 
   // Card 3D effects
@@ -360,10 +391,39 @@ export default function HomePage() {
                 <a href="#" className="text-dark-text hover:text-primary-green px-3 py-2 rounded-md text-sm font-medium transition-colors">Contact</a>
               </div>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center space-x-4">
               <button className="p-2 rounded-full text-dark-text hover:bg-gray-100 focus:outline-none transition-colors">
                 <ShoppingCart className="h-5 w-5" />
               </button>
+              
+              {/* Debug info */}
+              <span className="text-xs text-gray-500">
+                Auth: {user ? 'Logged In' : 'Not Logged In'}
+              </span>
+              
+              {user ? (
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-700">
+                    Hi, {user.first_name}!
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="text-sm text-gray-600 hover:text-primary-green transition-colors"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    console.log('Sign In button clicked!');
+                    setIsAuthModalOpen(true);
+                  }}
+                  className="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 transition-colors shadow-md border border-green-700 min-w-[100px]"
+                >
+                  Sign In
+                </button>
+              )}
             </div>
           </div>
         </nav>
@@ -537,6 +597,14 @@ export default function HomePage() {
           restaurantName={currentRestaurant.name}
         />
       )}
+
+      {/* Authentication Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={handleAuthSuccess}
+        initialMode="login"
+      />
 
       {/* Footer */}
       <footer className="text-white py-12 w-full" style={{ backgroundColor: '#264653' }}>

@@ -114,10 +114,10 @@ export function SearchBar({ onSearch }: SearchBarProps) {
       <button 
         onClick={getCurrentLocation}
         disabled={loading}
-        className="text-white hover:underline flex items-center justify-center gap-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
+        className="text-white/90 hover:text-white hover:bg-white/10 px-4 py-2 rounded-lg flex items-center justify-center gap-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 backdrop-blur-sm"
       >
-        <span className="w-4 h-4">🎯</span>
-        <span>Use my location</span>
+        <MapPin className="w-4 h-4" />
+        <span className="text-sm font-medium">Use my location</span>
       </button>
       
       {/* Error Message */}
