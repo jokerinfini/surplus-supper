@@ -266,7 +266,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
                   Location set successfully
                 </p>
                 <p className="text-xs text-green-600 mt-1">
-                  Coordinates: {formData.latitude.toFixed(4)}, {formData.longitude.toFixed(4)}
+                  Coordinates: {formData.latitude?.toFixed(4)}, {formData.longitude?.toFixed(4)}
                 </p>
               </div>
             )}

@@ -135,7 +135,7 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
 
         <div className="mt-6 text-center">
           <p className="text-gray-600">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <button
               onClick={onSwitchToRegister}
               className="text-green-600 hover:text-green-700 font-medium transition-colors underline"

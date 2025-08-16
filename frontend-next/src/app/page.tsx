@@ -11,7 +11,14 @@ import { isAuthenticated, getUser, logout } from '@/lib/auth'
 import type { User } from '@/lib/auth'
 
 // Recipe Modal Component
-function RecipeModal({ isOpen, onClose, ingredients, restaurantName }: any) {
+interface RecipeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  ingredients: string;
+  restaurantName: string;
+}
+
+function RecipeModal({ isOpen, onClose, ingredients, restaurantName }: RecipeModalProps) {
   const [loading, setLoading] = useState(false)
   const [recipe, setRecipe] = useState('')
 
@@ -174,7 +181,7 @@ function FallingFoodAnimation() {
       { width: 7, height: 8, data: [0, 0, 0, 4, 4, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 7, 7, 7, 0, 0, 0, 7, 7, 7, 7, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 0, 7, 7, 7, 7, 7, 0, 0, 0, 7, 7, 7, 0, 0] }
     ]
 
-    let fallingFoods: any[] = []
+    const fallingFoods: Food[] = []
     let lastSpawnTime = 0
 
     class Food {
@@ -185,9 +192,9 @@ function FallingFoodAnimation() {
       rotationSpeed: number
       bounced: boolean
       alpha: number
-      design: any
+             design: { width: number; height: number; data: number[] }
 
-      constructor(x: number, y: number, design: any) {
+             constructor(x: number, y: number, design: { width: number; height: number; data: number[] }) {
         this.design = design
         this.x = x
         this.y = y
@@ -202,7 +209,7 @@ function FallingFoodAnimation() {
         this.vy += GRAVITY
         this.y += this.vy
         this.rotation += this.rotationSpeed
-        const groundY = canvas.height - this.design.height * PIXEL_SIZE
+                 const groundY = canvas!.height - this.design.height * PIXEL_SIZE
         if (this.y > groundY && !this.bounced) {
           this.y = groundY
           this.vy *= -0.4

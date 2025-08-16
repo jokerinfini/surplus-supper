@@ -72,7 +72,7 @@ export const api = {
     return response.json()
   },
 
-  async createOrder(orderData: any): Promise<any> {
+  async createOrder(orderData: Record<string, unknown>): Promise<Record<string, unknown>> {
     const response = await fetch(`${API_BASE}/order/confirm`, {
       method: 'POST',
       headers: {
