@@ -31,7 +31,13 @@ func main() {
 	// Add CORS middleware
 	corsMiddleware := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
+			// Get CORS origin from environment variable, default to all origins for development
+			corsOrigin := os.Getenv("CORS_ORIGIN")
+			if corsOrigin == "" {
+				corsOrigin = "*"
+			}
+
+			w.Header().Set("Access-Control-Allow-Origin", corsOrigin)
 			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
 			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
