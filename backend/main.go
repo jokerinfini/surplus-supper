@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"surplus-supper/backend/api/auth"
 	"surplus-supper/backend/middleware"
@@ -35,6 +36,24 @@ func main() {
 			corsOrigin := os.Getenv("CORS_ORIGIN")
 			if corsOrigin == "" {
 				corsOrigin = "*"
+			}
+
+			// Handle multiple origins (comma-separated)
+			allowedOrigins := strings.Split(corsOrigin, ",")
+			requestOrigin := r.Header.Get("Origin")
+
+			// Check if request origin is in allowed origins
+			originAllowed := false
+			for _, origin := range allowedOrigins {
+				if strings.TrimSpace(origin) == requestOrigin {
+					originAllowed = true
+					break
+				}
+			}
+
+			// If no specific origin match, use the first allowed origin or "*"
+			if !originAllowed && len(allowedOrigins) > 0 {
+				corsOrigin = strings.TrimSpace(allowedOrigins[0])
 			}
 
 			w.Header().Set("Access-Control-Allow-Origin", corsOrigin)
