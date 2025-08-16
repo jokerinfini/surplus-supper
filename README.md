@@ -1,292 +1,285 @@
-# Surplus Supper 🍽️
+# 🍽️ Surplus Supper
 
-A marketplace application designed to reduce food waste by connecting restaurants with surplus food to customers seeking discounted meals.
+> A sustainable marketplace connecting restaurants with customers to reduce food waste by selling surplus food at discounted prices.
 
-## 🌟 Features
+[![Go Version](https://img.shields.io/badge/Go-1.21+-blue.svg)](https://golang.org/)
+[![Node.js Version](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](CONTRIBUTING.md)
 
-### For Customers
-- **Browse Nearby Restaurants**: Find restaurants with surplus food near your location
-- **Surprise Bags**: Get mystery bags of surplus food at great discounts
-- **Chef's Surprise**: AI-generated recipes using surplus ingredients
-- **Real-time Notifications**: Get notified when new offers become available
-- **Easy Ordering**: Simple checkout process with HTMX-powered interactions
+## 🌟 What is Surplus Supper?
 
-### For Restaurants
-- **Inventory Management**: Add and manage surplus food items
-- **Profit Advisor**: AI-powered pricing recommendations
-- **Real-time Dashboard**: Monitor incoming orders and sales
-- **Order Management**: Track order status and customer communications
+Surplus Supper is a marketplace platform that helps restaurants reduce food waste by connecting them with customers who want to purchase surplus food at discounted prices. Our mission is to create a sustainable food ecosystem while helping restaurants reduce waste and customers save money.
 
-### AI Features
-- **Profit Advisor**: Analyzes market data to suggest optimal discount prices
-- **Creative Kitchen**: Generates recipes from surplus ingredients based on user preferences
+### 🎯 Key Features
 
-## 🏗️ Architecture
+#### ✅ **Completed (Phase 1)**
+- **🔐 User Authentication**: JWT-based authentication system with secure password hashing
+- **🏪 Restaurant Discovery**: Location-based restaurant search with real-time geolocation
+- **🎨 Modern UI/UX**: Glassmorphism design with responsive layout and smooth animations
+- **📱 Mobile Responsive**: Optimized for all devices with touch-friendly interface
+- **🌍 Location Services**: GPS integration with reverse geocoding and distance calculation
+- **⚡ Real-time Search**: Instant restaurant search with location-based filtering
+- **🎭 Interactive Elements**: 3D card effects, animated backgrounds, and smooth transitions
 
-### Backend (Go)
-- **Microservices Architecture**: Separate services for users, restaurants, orders, AI, and notifications
-- **GraphQL API**: Single entry point using gqlgen for type-safe queries and mutations
-- **PostgreSQL Database**: Robust relational database with proper indexing
-- **WebSocket Support**: Real-time notifications using Gorilla WebSocket
-- **HTMX Integration**: Server-side rendering with dynamic interactions
+#### 🚧 **In Development (Phase 2)**
+- **🏪 Restaurant Dashboard**: Complete restaurant management system
+- **📦 Inventory Management**: Add, edit, and manage surplus food items
+- **📊 Analytics Dashboard**: Business insights and performance metrics
+- **🔔 Real-time Notifications**: Live order updates and alerts
+
+#### 🎯 **Planned Features**
+- **💳 Payment Processing**: Secure payment integration with Stripe
+- **📱 Mobile Apps**: Native iOS and Android applications
+- **🤖 AI Integration**: Smart pricing and waste prediction
+- **⭐ Reviews & Ratings**: Customer feedback system
+- **🎁 Loyalty Program**: Rewards for sustainable choices
+
+## 🏗️ Tech Stack
+
+### Backend
+- **Language**: Go 1.21+
+- **Framework**: Standard library with Gorilla Mux
+- **Database**: PostgreSQL with migrations
+- **Authentication**: JWT with bcrypt password hashing
+- **API**: RESTful API with CORS support
 
 ### Frontend
-- **HTMX**: Dynamic interactions without complex JavaScript
-- **Alpine.js**: Lightweight client-side enhancements
-- **Tailwind CSS**: Modern, responsive styling
-- **Server-side Rendering**: Templates served directly by Go backend
+- **Framework**: Next.js 14 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS with custom glassmorphism design
+- **Animations**: Framer Motion and Three.js
+- **Icons**: Lucide React
+- **Components**: Shadcn/ui
+
+### Infrastructure
+- **Containerization**: Docker & Docker Compose
+- **Database**: PostgreSQL with automatic migrations
+- **Development**: Hot-reload for both frontend and backend
+
+## 🚀 Quick Start
+
+### Prerequisites
+- **Go** 1.21+ (for backend)
+- **Node.js** 18+ (for frontend)
+- **Docker** (for database)
+- **Git**
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/YOUR_USERNAME/surplus-supper.git
+cd surplus-supper
+```
+
+### 2. Start the Database
+```bash
+docker-compose up -d postgres
+```
+
+### 3. Setup Backend
+```bash
+cd backend
+go mod download
+go run main.go
+```
+
+### 4. Setup Frontend
+```bash
+cd frontend-next
+npm install
+npm run dev
+```
+
+### 5. Verify Setup
+- **Backend API**: http://localhost:8080/health
+- **Frontend App**: http://localhost:3000
+- **Database**: PostgreSQL on port 5433
 
 ## 📁 Project Structure
 
 ```
 surplus-supper/
-├── backend/
-│   ├── aiService/           # AI features (Profit Advisor, Creative Kitchen)
-│   ├── api/
-│   │   ├── graph/          # GraphQL schema and resolvers
-│   │   └── rest/           # HTMX handlers
-│   ├── db/                 # Database connection and migrations
-│   ├── notificationService/ # Real-time notifications
-│   ├── orderService/       # Order management
-│   ├── restaurantService/  # Restaurant and inventory management
-│   ├── userService/        # User authentication and management
-│   ├── go.mod             # Go dependencies
+├── backend/                 # Go backend API
+│   ├── api/                # HTTP handlers
+│   │   └── auth/           # Authentication endpoints
+│   ├── middleware/         # Authentication & CORS
+│   ├── userService/        # User business logic
+│   ├── db/                 # Database migrations
 │   └── main.go            # Application entry point
-├── frontend/
-│   ├── assets/
-│   │   ├── css/           # Tailwind CSS styles
-│   │   └── js/            # Alpine.js components
-│   ├── templates/         # HTML templates (placeholder)
-│   └── tailwind.config.js # Tailwind configuration
-└── README.md
+├── frontend-next/          # Next.js frontend
+│   ├── src/
+│   │   ├── app/           # App router pages
+│   │   ├── components/    # React components
+│   │   │   ├── auth/      # Authentication components
+│   │   │   ├── features/  # Feature components
+│   │   │   └── ui/        # UI components
+│   │   ├── lib/           # Utility functions
+│   │   └── types/         # TypeScript types
+│   └── public/            # Static assets
+├── .github/               # GitHub templates and workflows
+├── CONTRIBUTING.md        # Contribution guidelines
+├── ROADMAP.md            # Development roadmap
+└── docker-compose.yml    # Development environment
 ```
 
-## 🚀 Quick Start
+## 🎨 Features in Detail
 
-### Prerequisites
+### 🔐 Authentication System
+- **User Registration**: Secure account creation with validation
+- **User Login**: JWT-based authentication with refresh tokens
+- **Password Security**: bcrypt hashing with salt rounds
+- **Session Management**: Automatic token refresh and logout
 
-- Go 1.21 or higher
-- PostgreSQL 12 or higher
-- Node.js (for Tailwind CSS compilation, optional)
+### 🏪 Restaurant Discovery
+- **Location Search**: GPS-based restaurant finding
+- **Real-time Geolocation**: Browser location API integration
+- **Distance Calculation**: Haversine formula for accurate distances
+- **Search Filtering**: Dynamic restaurant filtering and sorting
 
-### Installation
+### 🎨 Modern UI/UX
+- **Glassmorphism Design**: Modern glass-like interface elements
+- **3D Card Effects**: Interactive hover animations
+- **Animated Backgrounds**: Falling food particles with HTML5 Canvas
+- **Smooth Transitions**: Framer Motion animations throughout
+- **Responsive Layout**: Mobile-first design approach
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd surplus-supper
-   ```
+### 📱 Mobile Experience
+- **Touch Optimized**: Large touch targets and swipe gestures
+- **Progressive Web App**: Installable web application
+- **Offline Support**: Service worker for offline functionality
+- **Fast Loading**: Optimized images and lazy loading
 
-2. **Set up the database**
-   ```bash
-   # Create PostgreSQL database
-   createdb surplus_supper
-   
-   # Run migrations
-   psql -d surplus_supper -f backend/db/migrations/001_initial_schema.sql
-   ```
+## 🛠️ Development
 
-3. **Configure environment variables**
-   ```bash
-   export DATABASE_URL="postgres://username:password@localhost/surplus_supper?sslmode=disable"
-   export PORT="8080"
-   ```
-
-4. **Install Go dependencies**
-   ```bash
-   cd backend
-   go mod tidy
-   ```
-
-5. **Run the application**
-   ```bash
-   go run main.go
-   ```
-
-6. **Access the application**
-   - Open your browser and navigate to `http://localhost:8080`
-   - The application will serve both the API and frontend
-
-## 🔧 Configuration
-
-### Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | `postgres://postgres:password@localhost/surplus_supper?sslmode=disable` |
-| `PORT` | Server port | `8080` |
-| `JWT_SECRET` | JWT signing secret | `your-secret-key` |
-
-### Database Setup
-
-The application includes sample data for testing:
-
-- **Restaurants**: Tasty Bites, Spice Garden, Pizza Palace
-- **Inventory Items**: Various surplus food items with discounts
-- **Offers**: Surprise bags and special offers
-
-## 📚 API Documentation
-
-### GraphQL Endpoint
-- **URL**: `http://localhost:8080/graphql`
-- **Playground**: Available at the same URL when running in development
-
-### Key Queries
-```graphql
-# Get nearby restaurants
-query {
-  nearbyRestaurants(latitude: 40.7128, longitude: -74.0060, radius: 10) {
-    id
-    name
-    description
-    address
-    rating
-  }
-}
-
-# Get restaurant inventory
-query {
-  availableInventoryItems(restaurantId: 1) {
-    id
-    name
-    originalPrice
-    surplusPrice
-    quantity
-    expiryTime
-  }
-}
-```
-
-### Key Mutations
-```graphql
-# Create an order
-mutation {
-  createOrder(input: {
-    restaurantId: 1
-    orderItems: [{
-      inventoryItemId: 1
-      quantity: 2
-    }]
-  }) {
-    id
-    totalAmount
-    status
-  }
-}
-```
-
-## 🎨 Frontend Features
-
-### HTMX Integration
-- **Dynamic Search**: Real-time restaurant search without page reloads
-- **Shopping Cart**: Add items to cart with instant feedback
-- **Order Confirmation**: Seamless checkout process
-- **Inventory Updates**: Real-time inventory status updates
-
-### Alpine.js Components
-- **Toast Notifications**: Success/error messages
-- **Modal Dialogs**: Confirmation dialogs and forms
-- **Dropdown Menus**: User navigation and settings
-- **Form Validation**: Client-side validation with server feedback
-
-### Responsive Design
-- **Mobile-First**: Optimized for mobile devices
-- **Progressive Enhancement**: Works without JavaScript
-- **Accessibility**: WCAG compliant design
-
-## 🤖 AI Features
-
-### Profit Advisor
-- Analyzes market trends and competitor pricing
-- Suggests optimal discount percentages
-- Considers item category and expiry time
-- Provides confidence scores for recommendations
-
-### Creative Kitchen
-- Generates recipes from surplus ingredients
-- Considers user dietary preferences
-- Provides step-by-step instructions
-- Includes nutritional information and cooking times
-
-## 🔒 Security
-
-- **JWT Authentication**: Secure user sessions
-- **Password Hashing**: bcrypt for password security
-- **SQL Injection Prevention**: Parameterized queries
-- **CORS Configuration**: Proper cross-origin settings
-- **Input Validation**: Server-side validation for all inputs
-
-## 🧪 Testing
-
-### Backend Testing
+### Running in Development Mode
 ```bash
+# Terminal 1: Backend with hot-reload
+cd backend
+go run main.go
+
+# Terminal 2: Frontend with hot-reload
+cd frontend-next
+npm run dev
+
+# Terminal 3: Database (if not using Docker)
+docker-compose up -d postgres
+```
+
+### Testing
+```bash
+# Backend tests
 cd backend
 go test ./...
+
+# Frontend tests
+cd frontend-next
+npm run test
 ```
 
-### Database Testing
+### Building for Production
 ```bash
-# Test database connection
-go run main.go --test-db
+# Backend
+cd backend
+go build -o backend.exe
+
+# Frontend
+cd frontend-next
+npm run build
 ```
-
-## 📊 Monitoring
-
-### Health Checks
-- **Database**: Connection status and query performance
-- **Services**: Individual service health endpoints
-- **WebSocket**: Connection status and message throughput
-
-### Logging
-- Structured logging with request tracing
-- Error tracking and alerting
-- Performance metrics collection
-
-## 🚀 Deployment
-
-### Docker (Recommended)
-```bash
-# Build the application
-docker build -t surplus-supper .
-
-# Run with PostgreSQL
-docker-compose up -d
-```
-
-### Manual Deployment
-1. Set up PostgreSQL database
-2. Configure environment variables
-3. Build and run the Go application
-4. Set up reverse proxy (nginx/Apache)
-5. Configure SSL certificates
 
 ## 🤝 Contributing
 
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### 🎯 Good First Issues
+- [Restaurant Dashboard Feature](.github/ISSUE_TEMPLATE/restaurant_dashboard.md)
+- UI/UX improvements
+- Documentation updates
+- Bug fixes
+
+### 📋 How to Contribute
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
+## 📊 Project Status
+
+### ✅ Phase 1: Foundation (Completed)
+- [x] Project architecture and setup
+- [x] Go backend with REST API
+- [x] Next.js frontend with modern UI
+- [x] PostgreSQL database with migrations
+- [x] Docker development environment
+- [x] User authentication system
+- [x] Restaurant search and discovery
+- [x] Location-based services
+- [x] Responsive design implementation
+
+### 🚧 Phase 2: Restaurant Dashboard (In Progress)
+- [ ] Restaurant registration and authentication
+- [ ] Restaurant profile management
+- [ ] Inventory management system
+- [ ] Order management dashboard
+- [ ] Real-time notifications
+- [ ] Analytics and reporting
+
+### 🎯 Phase 3: Customer Experience (Planned)
+- [ ] Customer order placement
+- [ ] Payment processing (Stripe)
+- [ ] Order tracking and notifications
+- [ ] Customer reviews and ratings
+- [ ] Favorites and wishlist
+
+### 🤖 Phase 4: AI & Intelligence (Planned)
+- [ ] AI-powered recipe suggestions
+- [ ] Smart pricing recommendations
+- [ ] Food waste prediction
+- [ ] Personalized recommendations
+
+## 🏷️ Issue Labels
+
+- `bug` - Something isn't working
+- `enhancement` - New feature or request
+- `good first issue` - Good for newcomers
+- `help wanted` - Extra attention is needed
+- `restaurant-dashboard` - Restaurant management features
+- `frontend` - Frontend-related changes
+- `backend` - Backend-related changes
+- `database` - Database schema changes
+
+## 📈 Roadmap
+
+See our detailed [Development Roadmap](ROADMAP.md) for the complete feature timeline and technical milestones.
+
+## 🐛 Reporting Bugs
+
+Found a bug? Please use our [Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.md) to report it.
+
+## 💡 Suggesting Features
+
+Have an idea for a new feature? Use our [Feature Request Template](.github/ISSUE_TEMPLATE/feature_request.md) to suggest it.
+
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-- **HTMX**: For making dynamic web applications simple
-- **Alpine.js**: For lightweight client-side interactivity
-- **Tailwind CSS**: For rapid UI development
-- **Go**: For fast, reliable backend development
-- **PostgreSQL**: For robust data storage
+- **Design Inspiration**: Modern glassmorphism and sustainable design principles
+- **Icons**: [Lucide React](https://lucide.dev/) for beautiful icons
+- **Animations**: [Framer Motion](https://www.framer.com/motion/) for smooth interactions
+- **3D Graphics**: [Three.js](https://threejs.org/) for 3D elements
 
 ## 📞 Support
 
-For support and questions:
-- Create an issue in the GitHub repository
-- Check the documentation in the `/docs` folder
-- Join our community discussions
+- **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/surplus-supper/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/YOUR_USERNAME/surplus-supper/discussions)
+- **Documentation**: Check the [Contributing Guide](CONTRIBUTING.md)
 
 ---
 
-**Made with ❤️ to reduce food waste and help the planet** 
+**Made with ❤️ for a sustainable future** 🌱
+
+*Help us reduce food waste, one meal at a time!* 
