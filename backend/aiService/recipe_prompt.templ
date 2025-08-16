@@ -1,0 +1,62 @@
+// This is a placeholder file for AI recipe prompts
+// In a real implementation, this would contain structured prompts for LLM interactions
+
+package aiService
+
+// RecipePrompt represents a structured prompt for recipe generation
+type RecipePrompt struct {
+	Ingredients []string
+	Preference  string
+	Difficulty  string
+	Cuisine     string
+}
+
+// GeneratePrompt creates a structured prompt for recipe generation
+func GeneratePrompt(prompt RecipePrompt) string {
+	return `Generate a creative recipe using the following surplus ingredients: ` + 
+		joinIngredients(prompt.Ingredients) + `
+
+User Preference: ` + prompt.Preference + `
+Difficulty Level: ` + prompt.Difficulty + `
+Cuisine Style: ` + prompt.Cuisine + `
+
+Please provide the recipe in the following JSON format:
+{
+  "name": "Recipe Name",
+  "ingredients": ["ingredient1", "ingredient2", ...],
+  "instructions": ["step1", "step2", ...],
+  "prep_time": "X minutes",
+  "cook_time": "X minutes", 
+  "difficulty": "easy/medium/hard",
+  "tags": ["tag1", "tag2", ...],
+  "nutritional_info": {
+    "calories": 0,
+    "protein": "0g",
+    "carbs": "0g",
+    "fat": "0g"
+  }
+}
+
+Requirements:
+- Use all the provided ingredients
+- Consider the user preference: ` + prompt.Preference + `
+- Make it creative and appealing
+- Include clear, step-by-step instructions
+- Suggest appropriate cooking times and difficulty level
+- Add relevant tags for categorization
+- Include basic nutritional information
+
+Please respond with only the JSON object, no additional text.`
+}
+
+// joinIngredients joins ingredients into a comma-separated string
+func joinIngredients(ingredients []string) string {
+	result := ""
+	for i, ingredient := range ingredients {
+		if i > 0 {
+			result += ", "
+		}
+		result += ingredient
+	}
+	return result
+} 

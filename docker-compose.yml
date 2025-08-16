@@ -1,0 +1,61 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: surplus-supper-db
+    environment:
+      POSTGRES_DB: surplus_supper
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/db/migrations:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5433:5432"
+    networks:
+      - surplus-supper-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d surplus_supper"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Go Backend Application
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: surplus-supper-backend
+    environment:
+      DATABASE_URL: postgres://postgres:password@postgres:5432/surplus_supper?sslmode=disable
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - surplus-supper-network
+    restart: unless-stopped
+
+  # Optional: Redis for caching (if needed later)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: surplus-supper-redis
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - surplus-supper-network
+  #   volumes:
+  #     - redis_data:/data
+
+volumes:
+  postgres_data:
+    driver: local
+  # redis_data:
+  #   driver: local
+
+networks:
+  surplus-supper-network:
+    driver: bridge
+

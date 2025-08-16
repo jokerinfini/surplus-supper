@@ -1,0 +1,46 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: surplus-supper-db-dev
+    environment:
+      POSTGRES_DB: surplus_supper
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - ./backend/db/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - surplus-supper-network-dev
+
+  # Go Backend with hot reload
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: surplus-supper-backend-dev
+    environment:
+      DATABASE_URL: postgres://postgres:password@postgres:5432/surplus_supper?sslmode=disable
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - surplus-supper-network-dev
+    volumes:
+      - ./backend:/app
+      - /app/go.sum
+    restart: unless-stopped
+
+volumes:
+  postgres_data_dev:
+    driver: local
+
+networks:
+  surplus-supper-network-dev:
+    driver: bridge
+

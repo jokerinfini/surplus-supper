@@ -1,0 +1,284 @@
+scalar Time
+
+type User {
+  id: ID!
+  email: String!
+  firstName: String!
+  lastName: String!
+  phone: String
+  address: String
+  latitude: Float
+  longitude: Float
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Restaurant {
+  id: ID!
+  name: String!
+  description: String
+  address: String!
+  latitude: Float!
+  longitude: Float!
+  phone: String
+  email: String
+  cuisineType: String
+  rating: Float
+  isActive: Boolean!
+  createdAt: Time!
+  updatedAt: Time!
+  inventoryItems: [InventoryItem!]!
+  offers: [Offer!]!
+}
+
+type InventoryItem {
+  id: ID!
+  restaurantId: ID!
+  name: String!
+  description: String
+  originalPrice: Float!
+  surplusPrice: Float!
+  quantity: Int!
+  category: String
+  expiryTime: Time
+  isAvailable: Boolean!
+  createdAt: Time!
+  updatedAt: Time!
+  restaurant: Restaurant!
+}
+
+type Offer {
+  id: ID!
+  restaurantId: ID!
+  name: String!
+  description: String
+  originalPrice: Float!
+  surplusPrice: Float!
+  offerType: String!
+  ingredients: String
+  isAvailable: Boolean!
+  createdAt: Time!
+  updatedAt: Time!
+  restaurant: Restaurant!
+}
+
+type Order {
+  id: ID!
+  userId: ID
+  restaurantId: ID!
+  totalAmount: Float!
+  status: String!
+  pickupTime: Time
+  specialInstructions: String
+  createdAt: Time!
+  updatedAt: Time!
+  user: User
+  restaurant: Restaurant!
+  orderItems: [OrderItem!]!
+}
+
+type OrderItem {
+  id: ID!
+  orderId: ID!
+  inventoryItemId: ID
+  offerId: ID
+  quantity: Int!
+  unitPrice: Float!
+  totalPrice: Float!
+  createdAt: Time!
+  inventoryItem: InventoryItem
+  offer: Offer
+}
+
+type Notification {
+  id: ID!
+  userId: ID
+  restaurantId: ID
+  title: String!
+  message: String!
+  type: String!
+  isRead: Boolean!
+  createdAt: Time!
+  user: User
+  restaurant: Restaurant
+}
+
+type PriceRecommendation {
+  itemId: String!
+  originalPrice: Float!
+  recommendedPrice: Float!
+  confidenceScore: Float!
+  reasoning: String!
+}
+
+type Recipe {
+  name: String!
+  ingredients: [String!]!
+  instructions: [String!]!
+  prepTime: String!
+  cookTime: String!
+  difficulty: String!
+  tags: [String!]!
+}
+
+input CreateUserInput {
+  email: String!
+  password: String!
+  firstName: String!
+  lastName: String!
+  phone: String
+  address: String
+  latitude: Float
+  longitude: Float
+}
+
+input UpdateUserInput {
+  firstName: String
+  lastName: String
+  phone: String
+  address: String
+  latitude: Float
+  longitude: Float
+}
+
+input CreateOrderInput {
+  restaurantId: ID!
+  orderItems: [OrderItemInput!]!
+  specialInstructions: String
+}
+
+input OrderItemInput {
+  inventoryItemId: ID
+  offerId: ID
+  quantity: Int!
+}
+
+input CreateInventoryItemInput {
+  restaurantId: ID!
+  name: String!
+  description: String
+  originalPrice: Float!
+  surplusPrice: Float!
+  quantity: Int!
+  category: String
+  expiryTime: Time
+}
+
+input UpdateInventoryItemInput {
+  name: String
+  description: String
+  originalPrice: Float
+  surplusPrice: Float
+  quantity: Int
+  category: String
+  expiryTime: Time
+  isAvailable: Boolean
+}
+
+type Query {
+  # User queries
+  user(id: ID!): User
+  users: [User!]!
+  
+  # Restaurant queries
+  restaurant(id: ID!): Restaurant
+  restaurants(latitude: Float, longitude: Float, radius: Float): [Restaurant!]!
+  nearbyRestaurants(latitude: Float!, longitude: Float!, radius: Float!): [Restaurant!]!
+  
+  # Inventory queries
+  inventoryItem(id: ID!): InventoryItem
+  inventoryItems(restaurantId: ID): [InventoryItem!]!
+  availableInventoryItems(restaurantId: ID): [InventoryItem!]!
+  
+  # Offer queries
+  offer(id: ID!): Offer
+  offers(restaurantId: ID): [Offer!]!
+  availableOffers(restaurantId: ID): [Offer!]!
+  
+  # Order queries
+  order(id: ID!): Order
+  orders(userId: ID, restaurantId: ID, status: String): [Order!]!
+  userOrders(userId: ID!): [Order!]!
+  restaurantOrders(restaurantId: ID!): [Order!]!
+  
+  # Notification queries
+  notifications(userId: ID, restaurantId: ID, unreadOnly: Boolean): [Notification!]!
+  
+  # AI queries
+  priceRecommendation(itemId: String!): PriceRecommendation!
+  generateRecipe(ingredients: String!, preference: String!): Recipe!
+}
+
+type Mutation {
+  # User mutations
+  createUser(input: CreateUserInput!): User!
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  deleteUser(id: ID!): Boolean!
+  
+  # Restaurant mutations
+  createRestaurant(input: CreateRestaurantInput!): Restaurant!
+  updateRestaurant(id: ID!, input: UpdateRestaurantInput!): Restaurant!
+  deleteRestaurant(id: ID!): Boolean!
+  
+  # Inventory mutations
+  createInventoryItem(input: CreateInventoryItemInput!): InventoryItem!
+  updateInventoryItem(id: ID!, input: UpdateInventoryItemInput!): InventoryItem!
+  deleteInventoryItem(id: ID!): Boolean!
+  
+  # Offer mutations
+  createOffer(input: CreateOfferInput!): Offer!
+  updateOffer(id: ID!, input: UpdateOfferInput!): Offer!
+  deleteOffer(id: ID!): Boolean!
+  
+  # Order mutations
+  createOrder(input: CreateOrderInput!): Order!
+  updateOrderStatus(id: ID!, status: String!): Order!
+  cancelOrder(id: ID!): Order!
+  
+  # Notification mutations
+  markNotificationAsRead(id: ID!): Notification!
+  deleteNotification(id: ID!): Boolean!
+}
+
+input CreateRestaurantInput {
+  name: String!
+  description: String
+  address: String!
+  latitude: Float!
+  longitude: Float!
+  phone: String
+  email: String
+  cuisineType: String
+}
+
+input UpdateRestaurantInput {
+  name: String
+  description: String
+  address: String
+  latitude: Float
+  longitude: Float
+  phone: String
+  email: String
+  cuisineType: String
+  isActive: Boolean
+}
+
+input CreateOfferInput {
+  restaurantId: ID!
+  name: String!
+  description: String
+  originalPrice: Float!
+  surplusPrice: Float!
+  offerType: String!
+  ingredients: String
+}
+
+input UpdateOfferInput {
+  name: String
+  description: String
+  originalPrice: Float
+  surplusPrice: Float
+  offerType: String
+  ingredients: String
+  isAvailable: Boolean
+} 
