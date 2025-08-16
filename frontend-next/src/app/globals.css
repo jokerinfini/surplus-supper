@@ -1,82 +1,132 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
   body {
-    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    background-color: #F4F4F2;
+    color: #264653;
+  }
+  h1, h2, h3 {
     font-family: 'Poppins', sans-serif;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors;
+    @apply bg-primary-green hover:bg-opacity-90 text-white px-6 py-3 rounded-md font-semibold transition-all duration-200;
   }
   
   .btn-secondary {
-    @apply bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors;
+    @apply bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-md font-semibold transition-all duration-200;
   }
   
   .card {
-    @apply bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow;
+    @apply bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-300;
   }
   
   .input-field {
-    @apply w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent;
+    @apply w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-green focus:border-transparent;
   }
+
+  /* Glassmorphism search bar */
+  .glass-search {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  .glass-search:focus-within {
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  .glass-search input {
+    background: transparent;
+    border: none;
+    color: white !important;
+    font-weight: 500;
+  }
+  .glass-search input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 400;
+  }
+  .glass-search input:focus {
+    outline: none;
+    background: transparent;
+  }
+
+  /* Enhanced 3D Card effects */
+  .card-3d {
+    /* Enables smooth transitions for the transform and shadow */
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* Tells the browser to treat children of this element in 3D space */
+    transform-style: preserve-3d;
+  }
+  .card-3d:hover {
+    /* Applies the 3D rotation when you hover over the card */
+    transform: perspective(1000px) rotateY(var(--rotateY)) rotateX(var(--rotateX)) scale3d(1.05, 1.05, 1.05);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+  
+  .card-3d::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.25) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .card-3d:hover::before {
+    opacity: 1;
+  }
+  
+  /* Add a subtle border shadow for better definition */
+  .card-3d::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+    z-index: 3;
+  }
+  
+  /* Ensure content stays above the overlay */
+  .card-3d > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Fade in animations */
+  .fade-in-up {
+    animation: fadeIn 0.8s ease-out forwards;
+    opacity: 0;
+  }
+  
+  .delay-1 { animation-delay: 0.2s; }
+  .delay-2 { animation-delay: 0.4s; }
+  .delay-3 { animation-delay: 0.6s; }
 }
 
 @layer utilities {
@@ -85,7 +135,19 @@
   }
   
   .text-gradient {
-    @apply bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary-green to-green-600 bg-clip-text text-transparent;
+  }
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
   }
 }
 

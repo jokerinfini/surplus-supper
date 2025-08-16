@@ -1,8 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
-import { Search, Store, Utensils, Heart, ShoppingCart, Menu, Motorcycle, Facebook, Twitter, Instagram } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Search, MapPin, Star, ShoppingCart, Facebook, Twitter, Instagram } from 'lucide-react'
 import { SearchBar } from '@/components/features/search-bar'
 import { RestaurantCard } from '@/components/features/restaurant-card'
 import type { Restaurant } from '@/lib/api'
@@ -140,6 +140,145 @@ function useRestaurantModal() {
   }
 }
 
+// Falling Food Animation Component
+function FallingFoodAnimation() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const PIXEL_SIZE = 5
+    const GRAVITY = 0.05
+    const SPAWN_INTERVAL = 200
+
+    const PALETTE: { [key: number]: string | null } = {
+      0: null, 1: '#ff6b6b', 2: '#f9d74c', 3: '#8d5524', 4: '#6aaa64',
+      5: '#ffffff', 6: '#ff9f43', 7: '#e0aaff', 8: '#f08080', 9: '#ffdab9',
+      10: '#2f3542', 11: '#ff7979'
+    }
+
+    const foodDesigns = [
+      { width: 8, height: 7, data: [0, 3, 3, 3, 3, 3, 3, 0, 3, 5, 2, 2, 2, 2, 5, 3, 5, 4, 4, 4, 4, 4, 4, 5, 5, 1, 1, 1, 1, 1, 1, 5, 5, 3, 3, 3, 3, 3, 3, 5, 3, 5, 5, 5, 5, 5, 5, 3, 0, 3, 3, 3, 3, 3, 3, 0] },
+      { width: 8, height: 8, data: [0, 0, 0, 0, 3, 3, 3, 3, 0, 0, 0, 3, 2, 2, 2, 3, 0, 0, 3, 2, 11, 2, 11, 3, 0, 3, 2, 2, 2, 11, 2, 3, 3, 2, 11, 2, 2, 2, 2, 3, 3, 2, 2, 2, 11, 2, 2, 3, 3, 2, 2, 2, 2, 2, 3, 0, 3, 3, 3, 3, 3, 3, 0, 0] },
+      { width: 8, height: 7, data: [0, 5, 5, 5, 5, 5, 5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 10, 10, 10, 10, 10, 10, 0, 0, 10, 5, 5, 5, 5, 10, 0, 0, 10, 10, 10, 10, 10, 10, 0] },
+      { width: 8, height: 8, data: [0, 9, 9, 8, 8, 8, 9, 0, 9, 8, 8, 5, 5, 8, 8, 9, 9, 8, 5, 5, 5, 5, 8, 9, 8, 8, 5, 5, 5, 5, 8, 8, 8, 8, 5, 5, 5, 5, 8, 8, 9, 8, 5, 5, 5, 5, 8, 9, 9, 8, 8, 5, 5, 8, 8, 9, 0, 9, 9, 8, 8, 8, 9, 0] },
+      { width: 7, height: 8, data: [0, 0, 4, 4, 4, 0, 0, 0, 4, 4, 4, 4, 4, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 5, 1, 1, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0] },
+      { width: 8, height: 8, data: [0, 6, 6, 6, 6, 6, 6, 0, 6, 5, 5, 5, 5, 5, 5, 6, 6, 5, 6, 5, 5, 6, 5, 6, 6, 5, 5, 6, 6, 5, 5, 6, 6, 5, 5, 6, 6, 5, 5, 6, 6, 5, 6, 5, 5, 6, 5, 6, 6, 5, 5, 5, 5, 5, 5, 6, 0, 6, 6, 6, 6, 6, 6, 0] },
+      { width: 7, height: 8, data: [0, 0, 0, 4, 4, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 7, 7, 7, 0, 0, 0, 7, 7, 7, 7, 7, 0, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 0, 7, 7, 7, 7, 7, 0, 0, 0, 7, 7, 7, 0, 0] }
+    ]
+
+    let fallingFoods: any[] = []
+    let lastSpawnTime = 0
+
+    class Food {
+      x: number
+      y: number
+      vy: number
+      rotation: number
+      rotationSpeed: number
+      bounced: boolean
+      alpha: number
+      design: any
+
+      constructor(x: number, y: number, design: any) {
+        this.design = design
+        this.x = x
+        this.y = y
+        this.vy = Math.random() * 1 + 0.5
+        this.rotation = 0
+        this.rotationSpeed = (Math.random() - 0.5) * 0.02
+        this.bounced = false
+        this.alpha = 1
+      }
+
+      update() {
+        this.vy += GRAVITY
+        this.y += this.vy
+        this.rotation += this.rotationSpeed
+        const groundY = canvas.height - this.design.height * PIXEL_SIZE
+        if (this.y > groundY && !this.bounced) {
+          this.y = groundY
+          this.vy *= -0.4
+          this.rotationSpeed *= 0.5
+          this.bounced = true
+        }
+        if (this.bounced) {
+          this.alpha -= 0.02
+        }
+      }
+
+      draw() {
+        if (!ctx) return
+        ctx.save()
+        ctx.globalAlpha = this.alpha
+        const centerX = this.x + (this.design.width * PIXEL_SIZE) / 2
+        const centerY = this.y + (this.design.height * PIXEL_SIZE) / 2
+        ctx.translate(centerX, centerY)
+        ctx.rotate(this.rotation)
+        ctx.translate(-centerX, -centerY)
+        for (let i = 0; i < this.design.data.length; i++) {
+          const colorIndex = this.design.data[i]
+          if (PALETTE[colorIndex]) {
+            const col = i % this.design.width
+            const row = Math.floor(i / this.design.width)
+            ctx.fillStyle = PALETTE[colorIndex]
+            ctx.fillRect(this.x + col * PIXEL_SIZE, this.y + row * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE)
+          }
+        }
+        ctx.restore()
+      }
+    }
+
+    function resizeCanvas() {
+      if (canvas && canvas.parentElement) {
+        canvas.width = canvas.parentElement.offsetWidth
+        canvas.height = canvas.parentElement.offsetHeight
+      }
+    }
+
+    function spawnFood() {
+      if (!canvas) return
+      const design = foodDesigns[Math.floor(Math.random() * foodDesigns.length)]
+      const x = Math.random() * (canvas.width - design.width * PIXEL_SIZE)
+      const y = -design.height * PIXEL_SIZE
+      fallingFoods.push(new Food(x, y, design))
+    }
+
+    function animate(timestamp: number) {
+      if (!ctx || !canvas) return
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      if (timestamp - lastSpawnTime > SPAWN_INTERVAL) {
+        spawnFood()
+        lastSpawnTime = timestamp
+      }
+      for (let i = fallingFoods.length - 1; i >= 0; i--) {
+        const food = fallingFoods[i]
+        food.update()
+        food.draw()
+        if (food.alpha <= 0) {
+          fallingFoods.splice(i, 1)
+        }
+      }
+      requestAnimationFrame(animate)
+    }
+
+    const handleResize = () => resizeCanvas()
+    window.addEventListener('resize', handleResize)
+    resizeCanvas()
+    requestAnimationFrame(animate)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
+}
+
 export default function HomePage() {
   const [searchResults, setSearchResults] = useState<Restaurant[]>([])
   const [showResults, setShowResults] = useState(false)
@@ -150,87 +289,95 @@ export default function HomePage() {
     setShowResults(true);
   };
 
+  const handleHomeClick = () => {
+    setShowResults(false);
+    setSearchResults([]);
+  };
+
+  // Card 3D effects
+  useEffect(() => {
+    const cards = document.querySelectorAll('.card-3d');
+    
+    cards.forEach(card => {
+      // Listen for the mouse moving over the card
+      const handleMouseMove = (e: Event) => {
+        const mouseEvent = e as MouseEvent;
+        const rect = card.getBoundingClientRect();
+        // Calculate mouse position relative to the card's top-left corner
+        const x = mouseEvent.clientX - rect.left;
+        const y = mouseEvent.clientY - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        // Calculate the rotation angle based on how far the mouse is from the center
+        const rotateX = ((y - centerY) / centerY) * -10; // Max tilt of 10 degrees
+        const rotateY = ((x - centerX) / centerX) * 10;  // Max tilt of 10 degrees
+
+        // Update the CSS variables with the new rotation values
+        (card as HTMLElement).style.setProperty('--rotateX', `${rotateX}deg`);
+        (card as HTMLElement).style.setProperty('--rotateY', `${rotateY}deg`);
+      };
+
+      // When the mouse leaves, reset the card to its flat state
+      const handleMouseLeave = () => {
+        (card as HTMLElement).style.setProperty('--rotateX', '0deg');
+        (card as HTMLElement).style.setProperty('--rotateY', '0deg');
+      };
+
+      card.addEventListener('mousemove', handleMouseMove);
+      card.addEventListener('mouseleave', handleMouseLeave);
+
+      // Cleanup function
+      return () => {
+        card.removeEventListener('mousemove', handleMouseMove);
+        card.removeEventListener('mouseleave', handleMouseLeave);
+      };
+    });
+  }, [searchResults, showResults]); // Re-run when cards change
+
   return (
-    <div className="bg-green-50 font-['Poppins']">
+    <div className="bg-light-bg font-sans text-dark-text">
       {/* Header */}
-      <header className="bg-white shadow-md sticky top-0 z-50">
-        <nav className="container mx-auto px-6 py-3">
-          <div className="flex justify-between items-center">
-            <motion.a 
-              href="#" 
-              className="text-2xl font-bold text-green-600"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
-              Surplus Supper
-            </motion.a>
-            <div className="hidden md:flex items-center space-x-6">
-              <a href="#" className="text-gray-600 hover:text-green-600 transition-colors">Home</a>
-              <a href="#" className="text-gray-600 hover:text-green-600 transition-colors">Restaurants</a>
-              <a href="#" className="text-gray-600 hover:text-green-600 transition-colors">About Us</a>
-              <a href="#" className="text-gray-600 hover:text-green-600 transition-colors">Contact</a>
+      <header className="bg-white shadow-sm sticky top-0 z-50 w-full">
+        <nav className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex-shrink-0">
+              <motion.a 
+                href="#" 
+                className="text-2xl font-display font-bold text-primary-green"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+              >
+                Surplus Supper
+              </motion.a>
             </div>
-            <div className="flex items-center space-x-4">
-              <button className="text-gray-600 hover:text-green-600 transition-colors">
+            <div className="hidden md:block">
+              <div className="ml-10 flex items-baseline space-x-4">
+                <a href="#" onClick={handleHomeClick} className="text-dark-text hover:text-primary-green px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer">Home</a>
+                <a href="#" className="text-dark-text hover:text-primary-green px-3 py-2 rounded-md text-sm font-medium transition-colors">Restaurants</a>
+                <a href="#" className="text-dark-text hover:text-primary-green px-3 py-2 rounded-md text-sm font-medium transition-colors">About Us</a>
+                <a href="#" className="text-dark-text hover:text-primary-green px-3 py-2 rounded-md text-sm font-medium transition-colors">Contact</a>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <button className="p-2 rounded-full text-dark-text hover:bg-gray-100 focus:outline-none transition-colors">
                 <ShoppingCart className="h-5 w-5" />
-              </button>
-              <button className="md:hidden text-gray-600 hover:text-green-600 transition-colors">
-                <Menu className="h-5 w-5" />
               </button>
             </div>
           </div>
         </nav>
       </header>
 
-      {/* Search Results */}
-      {showResults && searchResults.length > 0 && (
-        <section className="py-8">
-          <div className="container mx-auto px-6">
-            <h2 className="text-2xl font-bold mb-6">Search Results</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {searchResults.map((restaurant) => (
-                <div key={restaurant.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold mb-2">{restaurant.name}</h3>
-                    <p className="text-gray-600 mb-4">{restaurant.description}</p>
-                    <div className="text-sm text-gray-500">
-                      <p className="mb-1">{restaurant.address}</p>
-                      <p className="mb-1">Cuisine: {restaurant.cuisine_type}</p>
-                      <p>Rating: {restaurant.rating}⭐</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Hero Section */}
-      <section className="relative text-white py-20 overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4-0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`
-          }}
-        />
+      <section className="relative bg-dark-text">
+        {/* Canvas for falling food animation */}
+        <FallingFoodAnimation />
+        <div className="absolute inset-0 bg-black opacity-50 z-10"></div>
         
-        {/* Animated Road */}
-        <div className="absolute bottom-0 left-0 w-full h-6 bg-black bg-opacity-60 border-t-4 border-dashed border-white border-opacity-70" />
-        
-        {/* Animated Scooter - Fixed direction and using white motorcycle */}
-        <motion.div 
-          className="absolute bottom-4 left-0 text-6xl text-white"
-          animate={{ x: ['-150px', 'calc(100vw + 200px)'] }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-          style={{ transform: 'scaleX(-1)' }} // Flip horizontally to face right direction
-        >
-          🏍️
-        </motion.div>
-
-        <div className="container mx-auto text-center relative z-10">
+        <div className="hero-content w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 lg:py-40 text-center text-white relative z-20">
           <motion.h1 
-            className="text-4xl md:text-6xl font-bold mb-4"
+            className="text-4xl sm:text-5xl md:text-6xl font-display font-bold tracking-tight"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -238,108 +385,150 @@ export default function HomePage() {
             Delicious Meals, Zero Waste
           </motion.h1>
           <motion.p 
-            className="text-lg md:text-xl mb-8"
+            className="mt-4 max-w-2xl mx-auto text-lg sm:text-xl"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             Get surplus food from your favorite restaurants at a discounted price.
           </motion.p>
+          
+          {/* Glassmorphism Search Bar */}
           <motion.div 
-            className="w-full max-w-xl mx-auto"
+            className="mt-8 max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4">
+            <div className="bg-white/10 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-white/20">
               <SearchBar onSearch={handleSearch} />
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="py-16 bg-green-100">
-        <div className="container mx-auto text-center px-4">
-          <motion.h2 
-            className="text-3xl font-bold mb-8 text-gray-800"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            How It Works
-          </motion.h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <motion.div 
-              className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
-              <div className="text-5xl text-green-600 mb-4">🏪</div>
-              <h3 className="text-xl font-bold mb-2">Find Restaurants</h3>
-              <p className="text-gray-600">Browse local restaurants with surplus food.</p>
-            </motion.div>
-            <motion.div 
-              className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <div className="text-5xl text-green-600 mb-4">🍽️</div>
-              <h3 className="text-xl font-bold mb-2">Choose Your Meal</h3>
-              <p className="text-gray-600">Select from a variety of delicious surplus meals.</p>
-            </motion.div>
-            <motion.div 
-              className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
-              <div className="text-5xl text-green-600 mb-4">💚</div>
-              <h3 className="text-xl font-bold mb-2">Save Food & Money</h3>
-              <p className="text-gray-600">Enjoy your meal and feel good about reducing food waste.</p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Restaurants */}
-      <section className="py-16 bg-green-800">
-        <div className="container mx-auto px-4">
-          <motion.h2 
-            className="text-3xl font-bold text-center mb-8 text-white"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            {showResults ? 'Search Results' : 'Featured Restaurants'}
-          </motion.h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {showResults ? (
-              searchResults.length > 0 ? (
-                searchResults.map((restaurant, index) => (
+      {/* Restaurants Section */}
+      <section className="py-16 sm:py-20 w-full">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {showResults ? (
+            <>
+              <h2 className="text-3xl font-display font-bold text-center text-dark-text mb-8">
+                Restaurants Near You
+              </h2>
+              {searchResults.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-600 text-lg mb-4">No restaurants found in your area.</p>
+                  <button 
+                    onClick={handleHomeClick}
+                    className="bg-primary-green text-white px-6 py-3 rounded-md hover:bg-opacity-90 transition-colors"
+                  >
+                    Search Again
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+                  {searchResults.map((restaurant, index) => (
+                    <motion.div
+                      key={restaurant.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                      className="w-full"
+                    >
+                      <RestaurantCard restaurant={restaurant} onSelect={openModal} />
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <h2 className="text-3xl font-display font-bold text-center text-dark-text mb-8">
+                Featured Restaurants
+              </h2>
+              <p className="text-center text-gray-600 max-w-xl mx-auto mb-12">
+                Discover surprise bags of delicious, unsold food from a variety of local spots.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
                   <RestaurantCard 
-                    key={restaurant.id || index} 
-                    restaurant={restaurant}
+                    restaurant={{
+                      id: 1,
+                      name: "Pizza Palace",
+                      description: "Authentic Italian pizza and pasta.",
+                      address: "123 Main St, New York, NY",
+                      cuisine_type: "Italian",
+                      rating: 4.5,
+                      distance: 0.5,
+                      surplus_items: ["Pizza Margherita", "Pasta Carbonara", "Garlic Bread"],
+                      latitude: 40.7128,
+                      longitude: -74.0060,
+                      phone: "+1-555-0123",
+                      email: "info@pizzapalace.com"
+                    }}
                     onSelect={openModal}
                   />
-                ))
-              ) : (
-                <div className="col-span-full text-center text-white">
-                  <p>No restaurants found. Try another location.</p>
-                </div>
-              )
-            ) : (
-              // Placeholder for featured restaurants or loading state
-              <div className="col-span-full text-center text-white">
-                <p>Search for restaurants to see results.</p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                >
+                  <RestaurantCard 
+                    restaurant={{
+                      id: 2,
+                      name: "Sushi Express",
+                      description: "Fresh sushi and Japanese cuisine.",
+                      address: "456 Broadway, New York, NY",
+                      cuisine_type: "Japanese",
+                      rating: 4.8,
+                      distance: 0.8,
+                      surplus_items: ["Salmon Nigiri", "California Roll", "Miso Soup"],
+                      latitude: 40.7589,
+                      longitude: -73.9851,
+                      phone: "+1-555-0456",
+                      email: "info@sushiexpress.com"
+                    }}
+                    onSelect={openModal}
+                  />
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                >
+                  <RestaurantCard 
+                    restaurant={{
+                      id: 3,
+                      name: "Burger Joint",
+                      description: "Classic American burgers and fries.",
+                      address: "789 Oak Ave, New York, NY",
+                      cuisine_type: "American",
+                      rating: 4.3,
+                      distance: 1.2,
+                      surplus_items: ["Cheeseburger", "French Fries", "Onion Rings"],
+                      latitude: 40.7505,
+                      longitude: -73.9934,
+                      phone: "+1-555-0789",
+                      email: "info@burgerjoint.com"
+                    }}
+                    onSelect={openModal}
+                  />
+                </motion.div>
               </div>
-            )}
-          </div>
+            </>
+          )}
         </div>
       </section>
 
+      {/* Recipe Modal */}
       {isModalOpen && currentRestaurant && (
         <RecipeModal
           isOpen={isModalOpen}
@@ -349,60 +538,41 @@ export default function HomePage() {
         />
       )}
 
-      {/* Mobile App Promo */}
-      <section className="py-16 bg-green-100">
-        <div className="container mx-auto px-4">
-          <motion.div 
-            className="flex flex-col md:flex-row items-center bg-white p-8 rounded-lg shadow-lg"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="md:w-1/2 text-center md:text-left mb-8 md:mb-0">
-              <h2 className="text-3xl font-bold mb-4">Get the Surplus Supper App</h2>
-              <p className="text-gray-600 mb-6">Download our app to easily order surplus food on the go. Available on both iOS and Android.</p>
-              <div className="flex justify-center md:justify-start space-x-4">
-                <a href="#" className="hover:opacity-80 transition-opacity">
-                  <img 
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Download_on_the_App_Store_Badge.svg/1200px-Download_on_the_App_Store_Badge.svg.png" 
-                    alt="App Store" 
-                    className="h-12"
-                  />
-                </a>
-                <a href="#" className="hover:opacity-80 transition-opacity">
-                  <img 
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/1200px-Google_Play_Store_badge_EN.svg.png" 
-                    alt="Google Play" 
-                    className="h-12"
-                  />
-                </a>
+      {/* Footer */}
+      <footer className="text-white py-12 w-full" style={{ backgroundColor: '#264653' }}>
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-xl font-display font-bold text-primary-green">Surplus Supper</h3>
+              <p className="mt-2 text-gray-300 text-sm">Eat Good. Do Good.</p>
+            </div>
+            <div>
+              <h4 className="font-semibold tracking-wider uppercase text-white">Quick Links</h4>
+              <ul className="mt-4 space-y-2 text-sm">
+                <li><a href="#" className="text-gray-300 hover:text-primary-green transition-colors">Home</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-primary-green transition-colors">About Us</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-primary-green transition-colors">Become a Partner</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold tracking-wider uppercase text-white">Support</h4>
+              <ul className="mt-4 space-y-2 text-sm">
+                <li><a href="#" className="text-gray-300 hover:text-primary-green transition-colors">FAQ</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-primary-green transition-colors">Contact Us</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-primary-green transition-colors">Terms of Service</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold tracking-wider uppercase text-white">Follow Us</h4>
+              <div className="mt-4 flex space-x-4">
+                <a href="#" className="text-gray-300 hover:text-primary-green transition-colors"><Facebook className="h-5 w-5" /></a>
+                <a href="#" className="text-gray-300 hover:text-primary-green transition-colors"><Instagram className="h-5 w-5" /></a>
+                <a href="#" className="text-gray-300 hover:text-primary-green transition-colors"><Twitter className="h-5 w-5" /></a>
               </div>
             </div>
-            <div className="md:w-1/2 flex justify-center">
-              <img 
-                src="https://cdn.dribbble.com/users/1043333/screenshots/11649021/media/cc12c2a681375744837f19b049360c61.png" 
-                alt="Mobile App" 
-                className="max-w-xs"
-              />
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-green-900 text-white py-8">
-        <div className="container mx-auto text-center px-4">
-          <p>&copy; 2024 Surplus Supper. All rights reserved.</p>
-          <div className="flex justify-center space-x-4 mt-4">
-            <a href="#" className="hover:text-green-400 transition-colors">
-              <Facebook className="h-5 w-5" />
-            </a>
-            <a href="#" className="hover:text-green-400 transition-colors">
-              <Twitter className="h-5 w-5" />
-            </a>
-            <a href="#" className="hover:text-green-400 transition-colors">
-              <Instagram className="h-5 w-5" />
-            </a>
+          </div>
+          <div className="mt-8 border-t border-gray-700 pt-8 text-center text-sm text-gray-400">
+            <p>&copy; 2024 Surplus Supper. All rights reserved.</p>
           </div>
         </div>
       </footer>
