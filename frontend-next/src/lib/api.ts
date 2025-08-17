@@ -65,7 +65,7 @@ export const api = {
   },
 
   async getRestaurant(id: number): Promise<{ restaurant: Restaurant; inventory: InventoryItem[] }> {
-    const response = await fetch(`${API_BASE}/restaurant/${id}`)
+    const response = await fetch(`${API_BASE}/api/restaurant/${id}`)
     if (!response.ok) {
       throw new Error('Failed to fetch restaurant')
     }
@@ -73,7 +73,7 @@ export const api = {
   },
 
   async createOrder(orderData: Record<string, unknown>): Promise<Record<string, unknown>> {
-    const response = await fetch(`${API_BASE}/order/confirm`, {
+    const response = await fetch(`${API_BASE}/api/order/confirm`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

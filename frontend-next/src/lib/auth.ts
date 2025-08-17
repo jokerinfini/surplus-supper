@@ -43,7 +43,7 @@ export interface UpdateProfileRequest {
   longitude?: number;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 // Token management
 export const getToken = (): string | null => {
@@ -84,7 +84,7 @@ export const removeUser = (): void => {
 
 // API functions
 export const register = async (data: RegisterRequest): Promise<AuthResponse> => {
-  const response = await fetch(`${API_BASE_URL}/auth/register`, {
+  const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -101,7 +101,7 @@ export const register = async (data: RegisterRequest): Promise<AuthResponse> => 
 };
 
 export const login = async (data: LoginRequest): Promise<AuthResponse> => {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ export const getProfile = async (): Promise<User> => {
     throw new Error('No authentication token');
   }
 
-  const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+  const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -149,7 +149,7 @@ export const updateProfile = async (data: UpdateProfileRequest): Promise<User> =
     throw new Error('No authentication token');
   }
 
-  const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+  const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -172,7 +172,7 @@ export const refreshToken = async (): Promise<{ token: string }> => {
     throw new Error('No authentication token');
   }
 
-  const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+  const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
