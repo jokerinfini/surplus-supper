@@ -1,4 +1,6 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
+// Ensure API_BASE doesn't end with /api to prevent duplicate paths
+const rawApiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
+const API_BASE = rawApiBase.endsWith('/api') ? rawApiBase.slice(0, -4) : rawApiBase
 
 export interface Restaurant {
   id: number

@@ -43,7 +43,9 @@ export interface UpdateProfileRequest {
   longitude?: number;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+// Ensure API_BASE_URL doesn't end with /api to prevent duplicate paths
+const rawApiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_BASE_URL = rawApiBaseUrl.endsWith('/api') ? rawApiBaseUrl.slice(0, -4) : rawApiBaseUrl;
 
 // Token management
 export const getToken = (): string | null => {
